@@ -32,6 +32,10 @@ import OrderDetails from "./Comp/OrderDetails";
 import OrderHistory from "./Account/OrderHistory";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import FeedBackForm from "./Account/FeedBackForm";
+import VerifyEmail from "./Account/VerifyEmailPage";
+import VerifyEmailPending from "./Account/VerifyEmailPending";
+import OAuthSuccess from "./Auth/AuthSucces";
+import OAuthFail from "./Auth/AuthFail";
 
 function AppContent() {
   const [cartItems, setCartItems] = useState([]);
@@ -41,7 +45,7 @@ function AppContent() {
   const [filterOutItems, setFilterItems] = useState(products);
   const [categoryButton, setCateButton] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const { isAuthenticated } = useAuth();
   const { theme, toggleTheme, isDark } = useTheme();
   let location = useLocation();
@@ -53,7 +57,7 @@ function AppContent() {
   useEffect(() => {
     let p = products;
     if (searching.trim() !== '') {
-      p = p.filter((eachItems) => 
+      p = p.filter((eachItems) =>
         eachItems.title.toLocaleLowerCase().includes(searching.toLocaleLowerCase())
       );
     }
@@ -89,7 +93,7 @@ function AppContent() {
 
   const [accountOpts, setAccountOpts] = useState(false);
   const [mobileMenuOpn, setMobileMenu] = useState(false);
-  
+
   const pageVariants = {
     initial: { opacity: 0, y: 15 },
     animate: { opacity: 1, y: 0 },
@@ -97,19 +101,17 @@ function AppContent() {
   };
 
   return (
-    <div className={`min-h-screen transition-all duration-500 ${
-      isDark 
-        ? 'bg-gradient-to-b  from-[#070F2B] to-[#1B1A55]' 
+    <div className={`min-h-screen transition-all duration-500 ${isDark
+        ? 'bg-gradient-to-b  from-[#070F2B] to-[#1B1A55]'
         : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'
-    }`}>
+      }`}>
       {loading && (
-        <div className={`w-full min-h-screen inset-0 z-50 fixed flex items-center justify-center ${
-          isDark ? 'bg-gradient-to-b from-blue-950/60 via-blue-800/20 to-blue-700/25' : ''
-        }`}>
+        <div className={`w-full min-h-screen inset-0 z-50 fixed flex items-center justify-center ${isDark ? 'bg-gradient-to-b  from-[#070F2B] to-[#1B1A55]' : ''
+          }`}>
           <Logo />
         </div>
       )}
-      
+
       <main className="w-full min-h-screen flex flex-col gap-2">
         <Header
           btnText={openCart ? <BsCartX /> : <BsCartCheck />}
@@ -123,7 +125,7 @@ function AppContent() {
           toggleDarkMode={toggleTheme}
           darkMode={isDark}
         />
-        
+
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -136,8 +138,8 @@ function AppContent() {
           >
             <Routes>
               <Route path="/" element={<Hero addToCart={addToCart} />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
+              <Route path="/login" element={<Login isDark={isDark} />} />
+              <Route path="/signup" element={<SignUp isDark={isDark} />} />
               <Route path="/profilepage" element={<ProfilePage isDark={isDark} />} />
               <Route path="/userdetail" element={<UserDetail />} />
               <Route path="/propicture" element={<ProPicture />} />
@@ -149,29 +151,36 @@ function AppContent() {
               <Route path="/cartbox" element={<CartBox cartItems={cartItems} setCartItems={setCartItems} />} />
               <Route path="/orderdetails/:id" element={<OrderDetails isDark={isDark} />} />
               <Route path="/yourorders" element={<OrderHistory isDark={isDark} />} />
-              <Route path="/feedbackform" element={<FeedBackForm/>} />
+              <Route path="/feedbackform" element={<FeedBackForm />} />
+
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/verify-email-pending" element={<VerifyEmailPending />} />
+ 
+              <Route path="/oauth-success" element={<OAuthSuccess />} />
+              <Route path="/oauth-fail" element={<OAuthFail/>} /> 
+
             </Routes>
           </motion.div>
         </AnimatePresence>
 
         <Footer darkMode={isDark} />
-        
+
         {categoryButton && (
           <CategoryFilterButton onFilterChange={setCategories} />
         )}
-        
+
         {openCart && (
           <MyCart darkMode={isDark} cartItems={cartItems} setCartItems={setCartItems} />
         )}
 
         {accountOpts && (
-          <AccountOptions setOpts={setAccountOpts} />
+          <AccountOptions isDark={isDark} setOpts={setAccountOpts} />
         )}
 
         {mobileMenuOpn && (
-          <MobileMenu 
-            AccountOptBtn={() => setAccountOpts(!accountOpts)} 
-            setOpts={setMobileMenu} 
+          <MobileMenu
+            AccountOptBtn={() => setAccountOpts(!accountOpts)}
+            setOpts={setMobileMenu}
             toggleMode={toggleTheme}
             darkMode={isDark}
           />
@@ -184,7 +193,7 @@ function AppContent() {
 // ✅ Main App Component
 function App() {
   return (
-    <BrowserRouter> {/* ✅ Yahan BrowserRouter use karen */}
+    <BrowserRouter> 
       <ThemeProvider>
         <AuthProvider>
           <AppContent />

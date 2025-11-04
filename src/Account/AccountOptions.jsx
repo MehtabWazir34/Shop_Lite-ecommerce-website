@@ -3,39 +3,50 @@ import { NavLink } from 'react-router-dom'
 // import { logout } from '../Auth/Config'
 import { useAuth } from '../Auth/AuthContext'
 
-function AccountOptions({ setOpts }) {
-  let {logout} = useAuth()
+function AccountOptions({ setOpts, isDark }) {
+  let { logout } = useAuth()
   return (
-    <div className="fixed right-4 top-16 bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 p-4 z-50 min-w-[200px] animate-fade-in">
-      
+    <div className={` ${isDark ? 'bg-blue-900/85' : 'bg-white/80 '} fixed right-4 top-16  backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 p-4 z-50 min-w-[200px] animate-fade-in`}>
+
       {/* Header */}
       <div className="border-b border-gray-200 pb-3 mb-3">
-        <h3 className="font-bold text-gray-800 text-lg">Account Menu</h3>
+        <h3 className="font-bold  text-lg">Account Menu</h3>
       </div>
-      
+
       {/* My Account Option */}
       <NavLink
         to={'/profilepage'}
         onClick={() => setOpts(false)}
-        className="flex items-center space-x-3 cursor-pointer transition-all duration-300 rounded-xl p-3 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 group mb-2"
+        className="flex items-center space-x-3 cursor-pointer transition-all duration-300 rounded-xl p-3 hover:bg-gradient-to-r hover:from-blue-200 hover:to-purple-200 hover:text-blue-600 group mb-2"
       >
-        <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
+        {/* <div className="bg-gradient-to-r from-blue-500 to-purple-500  p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
           👤
-        </div>
-        <span className="font-semibold text-gray-700 group-hover:text-blue-600">My Account</span>
+        </div> */}
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+          role="img" aria-labelledby="acctTitle" fill="none" stroke="currentColor"
+          stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="3.2"></circle>
+          <path d="M4 20c0-3.2 3.6-6 8-6s8 2.8 8 6"></path>
+        </svg>
+
+         <span className="font-semibold  group-hover:text-blue-900"> My Account</span>
       </NavLink>
 
       {/* Logout Option */}
       <button
         onClick={() => { logout(); setOpts(false); }}
-        className="flex items-center space-x-3 cursor-pointer transition-all duration-300 rounded-xl p-3 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 hover:text-red-600 group w-full text-left"
+        className="flex items-center space-x-3 cursor-pointer transition-all duration-300 rounded-xl p-3 hover:bg-gradient-to-r hover:from-red-200 hover:to-pink-200 hover:text-red-600 group w-full text-left"
       >
-        <div className="bg-gradient-to-r from-red-500 to-pink-500 text-white p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
-          🚪
-        </div>
-        <span className="font-semibold text-gray-700 group-hover:text-red-600">Logout</span>
-      </button>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+     role="img" aria-labelledby="logoutTitle" fill="none" stroke="currentColor"
+     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+      <path d="M16 17l4-5-4-5"></path>
+      <path d="M21 12H9"></path>
+      </svg>
 
+      <span className="font-semibold  group-hover:text-red-600">Logout</span>
+      </button>
       {/* Footer */}
       <div className="border-t border-gray-200 pt-3 mt-3">
         <p className="text-xs text-gray-500 text-center">ShopLite Account</p>

@@ -58,6 +58,7 @@ export const ThemeProvider = ({ children }) => {
   // Direct theme setter function (optional)
   const setThemeDirect = (newTheme) => {
     setTheme(newTheme);
+    
     setIsDark(newTheme === 'dark');
   };
 

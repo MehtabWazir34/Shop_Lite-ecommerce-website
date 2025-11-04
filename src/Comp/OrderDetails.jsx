@@ -44,7 +44,7 @@ const handleSubmit = async (values, { resetForm }) => {
       import.meta.env.VITE_APPWRITE_OrderCollection_ID,
       ID.unique(),
       {
-        userId: parseInt(user?.$id, 10),
+        userId: user.$id,
         productId: product.id,
         quantity: product.qty || 1,
         total,

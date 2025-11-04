@@ -1,237 +1,162 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ID } from 'appwrite';
-import { account } from '../Auth/Config.js';
-import { Toaster, toast } from 'sonner';
-import * as yup from "yup"
-import { Formik } from 'formik';
-import { useAuth } from '../Auth/AuthContext';
+import { account } from '../Auth/Config';
+import { toast, Toaster } from 'sonner';
+import InpLable from '../MiniParts/InpLable';
+import MyInput from '../MiniParts/Input';
 
-function SignUp() {
-  let [name, saveName] = useState('')
-  let [email, saveEmail] = useState('')
-  let [pass, savePass] = useState('')
-  let navigate = useNavigate()
-  const { register } = useAuth();
+function SignUp({ isDark }) {
 
-  const validationSchema = yup.object({
-    name: yup.string().required("User must have name!"),
-    email: yup.string().email("Enter valid email!").required("Email is required!"),
-    pass: yup.string().min(8, "Must be at least 8 characters!").required("Password is required!")
-  });
+  const navigate = useNavigate();
 
-  const initVal = {
-    name: '',
-    email: '',
-    pass: ''
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // ✅ Correct Signup Flow (Create user → Send verification email)
+const handleSendVerification = async (e) => {
+  e.preventDefault();
+
+  if (!name || !email || !pass) {
+    toast.error("Please fill all fields.");
+    return;
   }
 
-  const [loading, setLoading] = useState(false)
-
-  const handleSignup = async (e) => {
-    // ✅ Prevent default form submission
-    if (e) e.preventDefault();
-    
-    if (!email || !pass || !name) {
-      toast.warning("Fill the form properly.")
-      return;
-    }
-
+  try {
     setLoading(true);
+
+    // ✅ Create user first (required by Appwrite)
+    await account.create(
+      ID.unique(),
+      email,
+      pass,
+      name
+    );
+
+    // ✅ Login temporarily (Appwrite requires a session for verification email)
+    await account.createEmailPasswordSession(email, pass);
+
+    // ✅ Send verification email
+    await account.createVerification(
+      `${window.location.origin}/verify-email`
+    );
+
+    toast.success("Verification email sent! Check your inbox.");
+
+    // ✅ Logout temporary session
+    await account.deleteSession("current");
+
+    // ✅ Navigate to waiting screen
+    navigate("/verify-email-pending", {
+      state: { email }
+    });
+
+  } catch (err) {
+    toast.error("Sign-up failed.");
+    console.log(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  // ✅ Google OAuth2 Login
+  const handleGoogleSignIn = async () => {
     try {
-      console.log("Attempting signup with:", { name, email }); // ✅ Debug log
-      
-      // Appwrite signup
-      let theUser = await account.create(
-        ID.unique(),
-        email,
-        pass,
-        name
+      account.createOAuth2Session(
+        "google",
+        `${window.location.origin}/oauth-success`,
+        `${window.location.origin}/oauth-fail`,
       );
-
-      if (theUser) {
-        console.log("Signup successful:", theUser); // ✅ Debug log
-        
-        // Auto login after successful signup
-        const session = await account.createEmailPasswordSession(email, pass);
-        const userDetails = await account.get();
-        
-        // Prepare user data for context
-        const userData = {
-          id: userDetails.$id,
-          name: userDetails.name,
-          email: userDetails.email,
-          role: 'customer'
-        };
-
-        // Register in auth context
-        register(userData, session.secret);
-        
-        toast.success("Account created successfully!");
-        console.log("User created and logged in:", userData);
-        
-        // Redirect to home page
-        navigate("/", { replace: true });
-      }
-    } catch (error) {
-      console.error("Appwrite signup error:", error);
-      toast.error(error.message || "Something went wrong");
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      toast.error("Google login failed.");
+      console.log(err);
     }
   };
 
   return (
-    <div className='min-h-screen mt-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col items-center justify-center py-8'>
-      <Toaster position='top-center' richColors />
-
-      //Logo 
-      <div className="mb-6 text-center">
-        <div className="flex justify-center items-center">
+    <div className="min-h-screen mt-16 flex flex-col items-center justify-center bg-transparent py-8">
+      <Toaster richColors position="top-center" />
+<div className="flex justify-center items-center mb-3">
           <div className='w-auto cursor-pointer bg-transparent flex justify-center items-center'>
             <p className='text-3xl font-semibold bg-transparent text-[#fd366e]'>Shop</p> 
             <span className='text-gray-800 animate-bounce bg-transparent ml-[-30px] mb-2 text-xl'>Lite</span>
           </div>
         </div>
-        <p className="text-gray-600 text-lg">Create your account and start shopping</p>
-      </div>
-
-      <Formik
-        initialValues={initVal}
-        validationSchema={validationSchema}
-        onSubmit={handleSignup} // ✅ Direct form submission
+      <form
+        onSubmit={handleSendVerification}
+        className={`flex flex-col max-w-[480px] w-full transition-all duration-300 p-6 rounded-xl shadow-xl ${
+          isDark ? 'bg-blue-950/90 text-white' : 'text-black bg-white/50'
+        }`}
       >
-        {({ errors, touched }) => (
-          <form
-            onSubmit={handleSignup} // ✅ Direct form submission
-            className="
-              flex flex-col max-w-[480px] w-full 
-              rounded-2xl 
-              p-6
-              bg-white/90 backdrop-blur-sm
-              shadow-2xl hover:shadow-3xl
-              transition-all duration-300 ease-in-out 
-              hover:scale-[1.01]
-              border border-white/20
-            " >
+        <h2 className="text-2xl font-bold text-center mb-6">
+          Create Your Account
+        </h2>
 
-            <h2 className="text-2xl font-black text-gray-800 text-center mb-8">
-              Create Your <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Account</span>
-            </h2>
+        {/* Name */}
+        <InpLable labelFor={'name'} labelName={'Name'} />
+        <MyInput id={'name'} name={'name'} placeHolder={'Enter your name'} req={'required'} onChange={(p)=> setName(p.target.value)} type={'text'} value={name} />
+        
 
-            {/* Name Field */}
-            <div className="mb-4">
-              <label htmlFor="name" className="block text-gray-700 font-semibold mb-2 text-sm">
-                👤 Full Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Enter your full name"
-                value={name}
-                onChange={(a) => saveName(a.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white text-gray-800 placeholder-gray-500"
-                required
-              />
-              {errors.name && touched.name && (
-                <div className="text-red-500 text-sm mt-2 font-medium">{errors.name}</div>
-              )}
-            </div>
+        {/* Email */}
+        <InpLable labelFor={'email'} labelName={'Email'} />
+        <MyInput id={'email'} name={'email'} placeHolder={'Enter your email'} req={'required'} onChange={(p)=> setEmail(p.target.value)} type={'email'} value={email} />
+        
+       
 
-            {/* Email Field */}
-            <div className="mb-4">
-              <label htmlFor="email" className="block text-gray-700 font-semibold mb-2 text-sm">
-                📧 Email Address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => saveEmail(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 bg-white text-gray-800 placeholder-gray-500"
-                required
-              />
-              {errors.email && touched.email && (
-                <div className="text-red-500 text-sm mt-2 font-medium">{errors.email}</div>
-              )}
-            </div>
+        {/* Password */}
+        <InpLable labelFor={'password'} labelName={'Password'} />
+        <MyInput id={'password'} name={'password'} placeHolder={'Set your password'} req={'required'} onChange={(p)=> setPass(p.target.value)} type={'password'} value={pass} />
+        
 
-            {/* Password Field */}
-            <div className="mb-4">
-              <label htmlFor="password" className="block text-gray-700 font-semibold mb-2 text-sm">
-                🔒 Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Create a strong password"
-                value={pass}
-                onChange={(p) => savePass(p.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-300 bg-white text-gray-800 placeholder-gray-500"
-                required
-              />
-              {errors.pass && touched.pass && (
-                <div className="text-red-500 text-sm mt-2 font-medium">{errors.pass}</div>
-              )}
-            </div>
-
-            {/* Sign Up Button - Changed to submit type */}
-            <button
-              type="submit" // ✅ Changed to submit
-              disabled={loading}
-              className={`
-                max-w-[50%] mx-auto cursor-pointer p-2 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105
+        <button
+          type="submit"
+          disabled={loading}
+          className={` mx-auto 
+                w-full py-2 rounded-lg cursor-pointer transition-all duration-300 transform  hover:text-black
                 ${loading 
                   ? 'bg-gray-400 cursor-not-allowed' 
                   : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl'
                 } text-white
               `}
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Creating Account...
-                </span>
-              ) : (
-                <span className="flex items-center justify-center gap-2">
-                  Create Account
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </span>
-              )}
-            </button>
+        >
+          {loading ? "Creating Account..." : "Create Account"}
+        </button>
 
-            {/* Login Link */}
-            <p className='mt-6 text-center text-gray-600 text-sm'>
-              Already have an account?{" "}
-              <span 
-                onClick={() => navigate("/login")} 
-                className='text-blue-600 text-sm font-bold cursor-pointer hover:text-blue-700 transition-colors duration-300 underline'
-              >
-                Login Now
-              </span>
-            </p>
+        <div className="flex items-center my-4 gap-2">
+          <div className="h-[1px] bg-gray-300 flex-1"></div>
+          <p className="text-gray-500 text-sm">or</p>
+          <div className="h-[1px] bg-gray-300 flex-1"></div>
+        </div>
 
-            {/* Password Requirements */}
-            <div className="mt-6 p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
-              <p className="text-sm text-gray-700 text-center font-medium">
-                <span className="font-bold">🔐 Password must be at least 8 characters long</span>
-              </p>
-            </div>
-          </form>
-        )}
-      </Formik>
+        {/* Google OAuth */}
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          className="border p-2 rounded-lg transition-all duration-300 flex items-center justify-center gap-3 hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white cursor-pointer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-5 h-5">
+            <path fill="#EA4335" d="M24 9.5c3.94 0 6.6 1.7 8.12 3.13l5.94-5.94C34.3 3.53 29.65 1.5 24 1.5 14.83 1.5 7.01 6.98 3.48 14.85l6.95 5.4C11.9 14.08 17.41 9.5 24 9.5z"/>
+            <path fill="#34A853" d="M46.5 24.5c0-1.62-.15-3.18-.44-4.68H24v9.1h12.7c-.54 2.9-2.16 5.36-4.6 7.02l7.07 5.49c4.12-3.8 6.33-9.4 6.33-16.93z"/>
+            <path fill="#4A90E2" d="M24 47.5c6.3 0 11.58-2.08 15.44-5.57l-7.07-5.49c-1.96 1.32-4.45 2.11-8.37 2.11-6.42 0-11.85-4.32-13.79-10.17l-6.95 5.37C7.06 41.26 14.94 47.5 24 47.5z"/>
+            <path fill="#FBBC05" d="M10.21 28.38c-.46-1.32-.71-2.73-.71-4.18s.25-2.86.71-4.18l-6.95-5.37C1.86 17.35 1 20.6 1 24s.86 6.65 2.26 9.35l6.95-5.37z"/>
+          </svg>
+          Sign in with Google
+        </button>
 
-      {/* Background Elements */}
-      <div className="fixed top-20 left-10 w-16 h-16 bg-blue-200 rounded-full blur-2xl opacity-30 animate-float -z-10"></div>
-      <div className="fixed bottom-20 right-10 w-12 h-12 bg-purple-200 rounded-full blur-2xl opacity-30 animate-float delay-1000 -z-10"></div>
+        <p className="mt-6 text-center text-sm">
+          Already have an account?{" "}
+          <span
+            onClick={() => navigate("/login")}
+            className="text-blue-600 text-sm font-bold cursor-pointer hover:text-blue-700 transition-colors duration-300 underline"
+          >
+            Login Now
+          </span>
+        </p>
+      </form>
     </div>
-  )
+  );
 }
 
-export default SignUp
+export default SignUp;

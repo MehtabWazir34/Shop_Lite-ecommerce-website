@@ -2,7 +2,8 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import products from "./ProductList"; // import your product data
 import OrderDetails from "./OrderDetails";
-import ProductFeedbacks from "../Account/FeedbackPage";
+
+import FeedbackPage from "../Account/FeedbackPage";
 // import { handlePlaceOrder } from "../Account/BuyNowFun";
 
 function ItemDetails({ addToCart, isDark }) {
@@ -18,7 +19,7 @@ function ItemDetails({ addToCart, isDark }) {
       isDark 
         ? 'text-gray-100' 
         : 'text-gray-700'
-    } w-full h-[80vh] bg-w pt-12 relative left-0 top-0 my-[8rem] flex flex-col  place-items-center p-6`}>
+    } w-full h-full bg-w pt-12 relative left-0 top-0 my-[8rem] flex flex-col  place-items-center p-6`}>
       <div className="flex flex-col lg:flex-row gap-4 place-items-center rounded-md w-full h-full mt-8">
         <img
           src={product.img}
@@ -49,7 +50,7 @@ function ItemDetails({ addToCart, isDark }) {
         </div>
 
       </div>
-      <ProductFeedbacks/>
+      <FeedbackPage productId={product.id} isDark={isDark}/>
     </section>
   );
 }

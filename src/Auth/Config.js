@@ -19,7 +19,7 @@ export const signup = async (email, password, name) => {
 };
 
 export const login = async (email, password) => {
-  return await account.createEmailSession(email, password);
+  return await account.createEmailPasswordSession(email, password);
 };
 
 export const getCurrentUser = async () => {

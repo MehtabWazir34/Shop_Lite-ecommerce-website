@@ -1,6 +1,6 @@
 // src/authcontext.js
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { account } from "../appwrite"; // 👈 apni appwrite.js ka path
+import { account } from "../appwrite";
 
 const AuthContext = createContext();
 
@@ -26,45 +26,37 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus();
   }, []);
 
-  // ✅ Register
   const register = async (email, password, name) => {
     try {
       await account.create("unique()", email, password, name);
-      await account.createEmailSession(email, password);
+      await account.createEmailPasswordSession(email, password);
       const currentUser = await account.get();
       setUser(currentUser);
       setIsAuthenticated(true);
-      // reload page after signup
-      // window.location.reload();
     } catch (error) {
       console.error("Register error:", error.message);
       throw error;
     }
   };
 
-  // ✅ Login
   const login = async (email, password) => {
     try {
       await account.createEmailPasswordSession(email, password);
       const currentUser = await account.get();
       setUser(currentUser);
       setIsAuthenticated(true);
-      // reload page after login
-      // window.location.reload();
     } catch (error) {
       console.error("Login error:", error.message);
       throw error;
     }
   };
 
-  // ✅ Logout
+  
   const logout = async () => {
     try {
       await account.deleteSession("current");
       setUser(null);
       setIsAuthenticated(false);
-      // reload page after logout
-      // window.location.reload();
     } catch (error) {
       console.error("Logout error:", error.message);
     }

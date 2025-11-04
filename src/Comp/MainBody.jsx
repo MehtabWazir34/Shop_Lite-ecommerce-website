@@ -27,11 +27,7 @@ const itemVariants = {
     variants={containerVariants}
      whileInView={'show'}
     className={`w-full min-h-screen py-8
-      ${
-      isDark 
-        ? 'bg-gradient-to-b from-blue-950/60 via-blue-800/20 to-blue-700/25' 
-        : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'
-    }
+      bg-transparent
     `}>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

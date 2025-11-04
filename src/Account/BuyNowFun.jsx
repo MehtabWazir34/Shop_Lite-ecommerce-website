@@ -11,7 +11,7 @@ export const handlePlaceOrder = async ({product, total, address})=> {
       import.meta.env.VITE_APPWRITE_OrderCollection_ID,
       ID.unique(),
       {
-        userId: parseInt(user?.$id, 110),
+        userId: user.$id,
         productId: product.id,
         quantity: product.qty || 1,
         total: total,

@@ -9,7 +9,6 @@ export const CreateUser = async (userId, name, email, bio = "") => {
     userId,
     { Name: name, 
         Email: email,
-
         bio: bio || '' }
   );
   
