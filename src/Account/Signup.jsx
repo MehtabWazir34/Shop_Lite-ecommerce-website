@@ -4,7 +4,7 @@ import { ID } from 'appwrite';
 import { account } from '../Auth/Config';
 import { toast, Toaster } from 'sonner';
 import InpLable from '../MiniParts/InpLable';
-import MyInput from '../MiniParts/Input';
+import MyInput from '../MiniParts/MyInput';
 
 function SignUp({ isDark }) {
 

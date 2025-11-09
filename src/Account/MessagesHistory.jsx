@@ -3,7 +3,7 @@ import { account, DataBases } from '../Auth/Config';
 import { Query } from 'appwrite';
 import { NavLink } from 'react-router-dom';
 
-function MessagesHistory({isDark}) {
+function MessagesHistory() {
     let [myMsgs, setMsgs] = useState([]);
 
     useEffect(()=>{

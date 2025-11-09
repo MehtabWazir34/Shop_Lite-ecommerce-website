@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import "./index.css";
 import Header from "./Comp/Header";
 import Footer from "./Comp/Footer";
-import { Route, Routes, useLocation, BrowserRouter } from "react-router-dom"; // ✅ BrowserRouter yahan import karen
+import { Route, Routes, useLocation, BrowserRouter } from "react-router-dom";
 import MainBody from "./Comp/MainBody";
 import Login from "./Account/Login";
 import SignUp from "./Account/Signup";
@@ -36,6 +36,10 @@ import VerifyEmail from "./Account/VerifyEmailPage";
 import VerifyEmailPending from "./Account/VerifyEmailPending";
 import OAuthSuccess from "./Auth/AuthSucces";
 import OAuthFail from "./Auth/AuthFail";
+import CreateProduct from "./Account/CreateProduct";
+import CreatedProducts from "./Comp/CreatedProducts";
+import { DataBases } from "./Auth/Config";
+import CartOrder from "./Comp/CartOrder";
 
 function AppContent() {
   const [cartItems, setCartItems] = useState([]);
@@ -100,6 +104,42 @@ function AppContent() {
     exit: { opacity: 0, y: -15 },
   };
 
+
+    const [manualProducts, setManualProducts] = useState([]);  // your static products
+  const [userProducts, setUserProducts] = useState([]);
+  
+
+  const databaseId = import.meta.env.VITE_APPWRITE_DB_ID;
+  const myProductsTable = import.meta.env.VITE_APPWRITE_MyProductsTable_ID;
+
+  function mapProduct(doc) {
+    return {
+      id: doc.$id,
+      title: doc.title,
+      price: doc.price,
+      img: doc.ImgLink,
+      detail: doc.description,
+      cate: doc.category,
+    };
+  }
+
+  async function fetchUserProducts() {
+    try {
+      const res = await DataBases.listDocuments(databaseId, myProductsTable);
+      setUserProducts(res.documents.map(mapProduct));
+      setManualProducts(filterOutItems)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserProducts();
+  }, );
+
+  // ✅ Combine Manual + User Uploaded
+  const allProducts = [...manualProducts, ...userProducts];
+
   return (
     <div className={`min-h-screen transition-all duration-500 ${isDark
         ? 'bg-gradient-to-b  from-[#070F2B] to-[#1B1A55]'
@@ -146,7 +186,7 @@ function AppContent() {
               <Route path="/contactform" element={<Contact />} />
               <Route path="/featuredquality" element={<FeaturedQuality />} />
               <Route path="/about" element={<About />} />
-              <Route path="/shop" element={<Shop seeDetails={seeDetailsFun} onAdd={addToCart} products={filterOutItems} />} />
+              <Route path="/shop" element={<Shop seeDetails={seeDetailsFun} onAdd={addToCart} products={allProducts} />} />
               <Route path="/itemdetails/:id" element={<ItemDetails isDark={isDark} addToCart={addToCart} product={seeDetailsFun} />} />
               <Route path="/cartbox" element={<CartBox cartItems={cartItems} setCartItems={setCartItems} />} />
               <Route path="/orderdetails/:id" element={<OrderDetails isDark={isDark} />} />
@@ -158,6 +198,8 @@ function AppContent() {
  
               <Route path="/oauth-success" element={<OAuthSuccess />} />
               <Route path="/oauth-fail" element={<OAuthFail/>} /> 
+              <Route path="createproduct" element={<CreateProduct isDark={isDark}/>}/>
+              <Route path="cart-checkout" element={<CartOrder />}/>
 
             </Routes>
           </motion.div>

@@ -2,6 +2,8 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 // import { logout } from '../Auth/Config'
 import { useAuth } from '../Auth/AuthContext'
+import { LuLogOut, LuUpload } from 'react-icons/lu'
+import { MdOutlineAccountBox } from 'react-icons/md'
 
 function AccountOptions({ setOpts, isDark }) {
   let { logout } = useAuth()
@@ -22,14 +24,21 @@ function AccountOptions({ setOpts, isDark }) {
         {/* <div className="bg-gradient-to-r from-blue-500 to-purple-500  p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
           👤
         </div> */}
-         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-          role="img" aria-labelledby="acctTitle" fill="none" stroke="currentColor"
-          stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="8" r="3.2"></circle>
-          <path d="M4 20c0-3.2 3.6-6 8-6s8 2.8 8 6"></path>
-        </svg>
+         <MdOutlineAccountBox className='text-3xl'/>
 
          <span className="font-semibold  group-hover:text-blue-900"> My Account</span>
+      </NavLink>
+      <NavLink
+        to={'/createproduct'}
+        onClick={() => setOpts(false)}
+        className="flex items-center space-x-3 cursor-pointer transition-all duration-300 rounded-xl p-3 hover:bg-gradient-to-r hover:from-blue-200 hover:to-purple-200 hover:text-blue-600 group mb-2"
+      >
+        {/* <div className="bg-gradient-to-r from-blue-500 to-purple-500  p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
+          👤
+        </div> */}
+         <LuUpload className='text-3xl' />
+
+         <span className="font-semibold  group-hover:text-blue-900">Share new item</span>
       </NavLink>
 
       {/* Logout Option */}
@@ -37,13 +46,8 @@ function AccountOptions({ setOpts, isDark }) {
         onClick={() => { logout(); setOpts(false); }}
         className="flex items-center space-x-3 cursor-pointer transition-all duration-300 rounded-xl p-3 hover:bg-gradient-to-r hover:from-red-200 hover:to-pink-200 hover:text-red-600 group w-full text-left"
       >
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-     role="img" aria-labelledby="logoutTitle" fill="none" stroke="currentColor"
-     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-      <path d="M16 17l4-5-4-5"></path>
-      <path d="M21 12H9"></path>
-      </svg>
+      <LuLogOut className='text-3xl'/>
+      
 
       <span className="font-semibold  group-hover:text-red-600">Logout</span>
       </button>

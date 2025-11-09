@@ -6,7 +6,7 @@ import { Formik } from 'formik';
 import * as yup from 'yup';
 import { useAuth } from '../Auth/AuthContext';
 import InpLable from '../MiniParts/InpLable.jsx';
-import MyInput from '../MiniParts/Input.jsx';
+import MyInput from '../MiniParts/MyInput.jsx';
 
 function Login({isDark}) {
   let [email, saveEmail] = useState('');

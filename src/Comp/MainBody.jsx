@@ -3,6 +3,7 @@ import React from "react";
 import ProBox from "./ProBox";
 import ItemDetails from "./ItemDetails";
 import { motion } from "framer-motion";
+import CreatedProducts from "./CreatedProducts";
 
 function MainBody({ addToCart, products, seeDetailsBtn, isDark }) {
 
@@ -79,6 +80,7 @@ const itemVariants = {
         className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ">
           {products.length > 0 ? (
             products.map((eachProduct) => (
+              
               <motion.div 
               variants={itemVariants}
                 key={eachProduct.id}
@@ -91,6 +93,7 @@ const itemVariants = {
                   {...eachProduct}
                   onAdd={() => addToCart(eachProduct)} seeDetails={seeDetailsBtn}
                 />
+                
               </motion.div>
             ))
           ) : (
@@ -130,8 +133,6 @@ const itemVariants = {
         <div className="fixed bottom-20 right-10 w-12 h-12 bg-purple-200 rounded-full blur-2xl opacity-30 animate-float delay-1000 -z-10"></div>
         <div className="fixed top-1/2 left-1/4 w-8 h-8 bg-pink-200 rounded-full blur-2xl opacity-30 animate-pulse-slow -z-10"></div>
       </div>
-
-    {/* </div> 2nd div */}
 
 
     </motion.main> //Main Div

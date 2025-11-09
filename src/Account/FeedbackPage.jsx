@@ -18,7 +18,7 @@ export default function FeedbackPage({ productId, isDark }) {
         const res = await DataBases.listDocuments(
           dbId,
           tableId,
-          [Query.equal("productId", [Number(productId)])]
+          [Query.equal("productId", (productId))]
         );
 
         setReviews(res.documents); 

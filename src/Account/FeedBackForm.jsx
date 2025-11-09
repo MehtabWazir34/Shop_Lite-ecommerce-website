@@ -1,15 +1,10 @@
 import { useState } from "react";
-
 import { account, DataBases, ID } from "../Auth/Config";
 import { useLocation } from "react-router-dom";
-import { string } from "yup";
-
 
 export default function FeedBackForm({ onSubmitSuccess }) {
   const dbId = import.meta.env.VITE_APPWRITE_DB_ID 
   const feedbackTable = import.meta.env.VITE_APPWRITE_FeedbacksTable
-
-
 
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
@@ -33,12 +28,14 @@ export default function FeedBackForm({ onSubmitSuccess }) {
 
     try {
     let user = await account.get();
+    console.log("UserCheck", user);
+    
         let userName = user.name;
       await DataBases.createDocument(
         dbId, feedbackTable,
         ID.unique(),
         {
-          productId: Number(productId),
+          productId: (productId),
           orderId,
           userName,
           rating,
